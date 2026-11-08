@@ -1,31 +1,51 @@
-name: Build RE1HD_FreeSave ASI
+name: Build
 
 on:
   push:
+  pull_request:
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: ilammy/msvc-dev-cmd@v1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar MSVC (x86 / 32 bits)
+        uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x86
 
-      - name: Compile
-        shell: pwsh
+      - name: Compilar RE0HD_FreeSave
+        shell: cmd
         run: |
-          $src = Get-ChildItem -Recurse -Filter RE1HD_FreeSave.cpp | Select-Object -First 1
-          if (-not $src) { throw "RE1HD_FreeSave.cpp not found" }
-          Set-Location $src.DirectoryName
-          cl /nologo /LD /O2 /MT /EHsc /D_CRT_SECURE_NO_WARNINGS RE1HD_FreeSave.cpp /Fe:RE1HD_FreeSave.asi /link user32.lib kernel32.lib
-          if ($LASTEXITCODE -ne 0) { throw "Build failed" }
+          mkdir out\RE0HD
+          cl /nologo /LD /O2 /MT /EHsc /W3 /D_CRT_SECURE_NO_WARNINGS /DWIN32_LEAN_AND_MEAN RE0HD_FreeSave.cpp /Fe:out\RE0HD\RE0HD_FreeSave.asi /Fo:out\RE0HD\ user32.lib kernel32.lib
+          copy RE0HD_FreeSave.ini out\RE0HD\
 
-      - uses: actions/upload-artifact@v4
+      - name: Compilar RE1HD_FreeSave
+        shell: cmd
+        run: |
+          mkdir out\RE1HD
+          cl /nologo /LD /O2 /MT /EHsc /W3 /D_CRT_SECURE_NO_WARNINGS /DWIN32_LEAN_AND_MEAN RE1HD_FreeSave.cpp /Fe:out\RE1HD\RE1HD_FreeSave.asi /Fo:out\RE1HD\ user32.lib kernel32.lib
+          copy RE1HD_FreeSave.ini out\RE1HD\
+
+      - name: Verificar que são 32 bits
+        shell: cmd
+        run: |
+          dumpbin /headers out\RE0HD\RE0HD_FreeSave.asi | findstr /C:"machine"
+          dumpbin /headers out\RE1HD\RE1HD_FreeSave.asi | findstr /C:"machine"
+
+      - name: Enviar RE0HD_FreeSave
+        uses: actions/upload-artifact@v4
+        with:
+          name: RE0HD_FreeSave
+          path: out/RE0HD/*
+
+      - name: Enviar RE1HD_FreeSave
+        uses: actions/upload-artifact@v4
         with:
           name: RE1HD_FreeSave
-          path: |
-            **/RE1HD_FreeSave.asi
-            **/RE1HD_FreeSave.ini
+          path: out/RE1HD/*
