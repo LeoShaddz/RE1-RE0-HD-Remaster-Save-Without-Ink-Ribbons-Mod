@@ -1,4 +1,4 @@
-# Resident Evil HD Remaster Save Without Ink Ribbons Mod
+# Resident Evil / Resident Evil 0 HD Remaster Save Without Ink Ribbons Mod
 
 This mod makes it possible to save the game without needing ink ribbons.
 
