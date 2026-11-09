@@ -15,7 +15,7 @@ Keep in mind that this is optional, if you feel it makes the game too easy, simp
 3. Copy the .asi and .ini files into the "scripts" folder
 4. Done
 
-**RE**:
+**RE1**:
 
 1. Install the Ultimate Asi Loader in in the game's root folder
 2. Extract the file "RE.HD.Remaster.Save.Without.Ink.Ribbons.Mod.v1.0.zip"
